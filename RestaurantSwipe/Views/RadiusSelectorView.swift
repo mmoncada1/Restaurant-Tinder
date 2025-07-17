@@ -53,7 +53,7 @@ struct RadiusSelectorView: View {
                         Image(systemName: "location.circle")
                             .foregroundColor(.blue)
                     }
-                    .onChange(of: radius) { _, _ in
+                    .onChange(of: radius) { oldValue, newValue in
                         // Add a small delay to prevent too many API calls while dragging
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                             onRadiusChange()

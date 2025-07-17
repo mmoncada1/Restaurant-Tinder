@@ -12,19 +12,41 @@ struct ContentView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             // Main Swipe View
-            VStack {
-                if locationManager.isLocationAvailable {
-                    VStack(spacing: 20) {
-                        RadiusSelectorView(radius: $searchRadius) {
-                            fetchRestaurants()
+            NavigationView {
+                VStack {
+                    if locationManager.isLocationAvailable {
+                        VStack(spacing: 20) {
+                            RadiusSelectorView(radius: $searchRadius) {
+                                fetchRestaurants()
+                            }
+                            
+                            CardStackView()
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .refreshable {
+                                    fetchRestaurants()
+                                }
                         }
-                        
-                        CardStackView()
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .padding()
+                    } else {
+                        LocationPermissionView()
                     }
-                    .padding()
-                } else {
-                    LocationPermissionView()
+                }
+                .navigationTitle("Discover")
+                .navigationBarTitleDisplayMode(.large)
+                .toolbar {
+                    if locationManager.isLocationAvailable {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button(action: fetchRestaurants) {
+                                if restaurantService.isLoading {
+                                    ProgressView()
+                                        .scaleEffect(0.8)
+                                } else {
+                                    Image(systemName: "arrow.clockwise")
+                                }
+                            }
+                            .disabled(restaurantService.isLoading)
+                        }
+                    }
                 }
             }
             .tabItem {
@@ -43,6 +65,11 @@ struct ContentView: View {
         }
         .onAppear {
             setupLocation()
+        }
+        .onChange(of: locationManager.isLocationAvailable) { oldValue, newValue in
+            if newValue && !oldValue {
+                fetchRestaurants()
+            }
         }
         .alert("Location Required", isPresented: $showingLocationAlert) {
             Button("Settings") {

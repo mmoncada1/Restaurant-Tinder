@@ -17,18 +17,41 @@ struct RestaurantCardView: View {
             
             VStack(spacing: 0) {
                 // Restaurant Image
-                AsyncImage(url: URL(string: restaurant.imageURL ?? "")) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                } placeholder: {
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.3))
-                        .overlay(
-                            Image(systemName: "photo")
-                                .font(.system(size: 40))
-                                .foregroundColor(.gray)
-                        )
+                AsyncImage(url: URL(string: restaurant.imageURL ?? "")) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                    case .failure(_):
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.3))
+                            .overlay(
+                                VStack {
+                                    Image(systemName: "photo")
+                                        .font(.system(size: 40))
+                                        .foregroundColor(.gray)
+                                    Text("Image unavailable")
+                                        .font(.caption)
+                                        .foregroundColor(.gray)
+                                }
+                            )
+                    case .empty:
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.3))
+                            .overlay(
+                                ProgressView()
+                                    .scaleEffect(1.5)
+                            )
+                    @unknown default:
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.3))
+                            .overlay(
+                                Image(systemName: "photo")
+                                    .font(.system(size: 40))
+                                    .foregroundColor(.gray)
+                            )
+                    }
                 }
                 .frame(height: 200)
                 .clipped()
@@ -138,6 +161,10 @@ struct RestaurantCardView: View {
         let swipeDistance = gesture.translation.width
         
         if abs(swipeDistance) > swipeThreshold {
+            // Add haptic feedback
+            let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+            impactFeedback.impactOccurred()
+            
             // Complete the swipe
             let finalOffset: CGFloat = swipeDistance > 0 ? 1000 : -1000
             

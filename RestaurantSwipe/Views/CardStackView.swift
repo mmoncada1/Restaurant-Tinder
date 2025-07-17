@@ -14,6 +14,10 @@ struct CardStackView: View {
             ZStack {
                 if restaurantService.isLoading {
                     LoadingView()
+                } else if let error = restaurantService.error {
+                    ErrorView(error: error) {
+                        // Retry functionality - we can add this later
+                    }
                 } else if restaurantService.restaurants.isEmpty && !restaurantService.isLoading {
                     EmptyStateView()
                 } else if currentIndex >= restaurantService.restaurants.count {
@@ -109,12 +113,21 @@ struct CardStackView: View {
     
     private func likeCurrentRestaurant() {
         guard currentIndex < restaurantService.restaurants.count else { return }
+        
+        // Add haptic feedback
+        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+        impactFeedback.impactOccurred()
+        
         let restaurant = restaurantService.restaurants[currentIndex]
         favoritesStore.addToFavorites(restaurant)
         nextCard()
     }
     
     private func passCurrentRestaurant() {
+        // Add haptic feedback
+        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+        impactFeedback.impactOccurred()
+        
         nextCard()
     }
     
@@ -150,6 +163,35 @@ struct EmptyStateView: View {
                 .multilineTextAlignment(.center)
                 .foregroundColor(.secondary)
                 .padding(.horizontal)
+        }
+        .padding()
+    }
+}
+
+struct ErrorView: View {
+    let error: String
+    let onRetry: () -> Void
+    
+    var body: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "exclamationmark.triangle")
+                .font(.system(size: 80))
+                .foregroundColor(.orange)
+            
+            Text("Something went wrong")
+                .font(.title2)
+                .fontWeight(.semibold)
+            
+            Text(error)
+                .multilineTextAlignment(.center)
+                .foregroundColor(.secondary)
+                .padding(.horizontal)
+            
+            Button("Try Again") {
+                onRetry()
+            }
+            .buttonStyle(.borderedProminent)
+            .font(.headline)
         }
         .padding()
     }

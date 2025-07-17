@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RestaurantSwipe - Web Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: #f2f2f7;
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .status-bar {
+            height: 44px;
+            background: #f2f2f7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .app-header {
+            background: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #e5e5ea;
+        }
+
+        .app-title {
+            font-size: 34px;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 5px;
+        }
+
+        .app-subtitle {
+            color: #8e8e93;
+            font-size: 16px;
+        }
+
+        .radius-selector {
+            background: white;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .radius-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .radius-icon {
+            width: 20px;
+            height: 20px;
+            color: #007AFF;
+        }
+
+        .radius-text {
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .radius-controls {
+            margin-top: 15px;
+        }
+
+        .radius-slider {
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        .radius-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .radius-btn {
+            background: #f2f2f7;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 16px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .radius-btn.active {
+            background: #007AFF;
+            color: white;
+        }
+
+        .card-stack {
+            position: relative;
+            height: 400px;
+            margin: 20px;
+            perspective: 1000px;
+            flex: 1;
+        }
+
+        .restaurant-card {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: calc(100% - 40px);
+            height: 380px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            cursor: grab;
+            transition: transform 0.3s ease;
+            z-index: 10;
+        }
+
+        .restaurant-card:active {
+            cursor: grabbing;
+        }
+
+        .restaurant-card:nth-child(3) {
+            transform: scale(0.95) translateY(10px);
+            z-index: 9;
+        }
+
+        .restaurant-card:nth-child(4) {
+            transform: scale(0.9) translateY(20px);
+            z-index: 8;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .restaurant-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .restaurant-category {
+            color: #8e8e93;
+            margin-bottom: 15px;
+        }
+
+        .restaurant-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .star {
+            color: #ffcc02;
+        }
+
+        .distance {
+            color: #007AFF;
+            font-weight: 500;
+        }
+
+        .action-buttons {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 40px;
+        }
+
+        .action-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+
+        .pass-btn {
+            background: #ff4458;
+            color: white;
+        }
+
+        .like-btn {
+            background: #4cd964;
+            color: white;
+        }
+
+        .tab-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 83px;
+            background: white;
+            border-top: 1px solid #e5e5ea;
+            display: flex;
+            padding-bottom: 34px;
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+            color: #8e8e93;
+        }
+
+        .tab-item.active {
+            color: #007AFF;
+        }
+
+        .swipe-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 60px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .swipe-indicator.like {
+            color: #4cd964;
+        }
+
+        .swipe-indicator.pass {
+            color: #ff4458;
+        }
+
+        .instructions {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="screen">
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>•••</span>
+                <span>100%</span>
+            </div>
+            
+            <div class="main-content">
+                <div class="app-header">
+                    <div class="app-title">Discover</div>
+                    <div class="app-subtitle">Swipe to find restaurants</div>
+                </div>
+
+                <div class="instructions" id="instructions">
+                    <button class="close-btn" onclick="closeInstructions()">×</button>
+                    <h3>How to Test:</h3>
+                    <p>• Drag cards left or right to swipe<br>
+                    • Use action buttons below<br>
+                    • Adjust search radius<br>
+                    • This simulates your iOS app!</p>
+                </div>
+
+                <div class="radius-selector">
+                    <div class="radius-header" onclick="toggleRadius()">
+                        <svg class="radius-icon" fill="currentColor" viewBox="0 0 20 20">
+                            <circle cx="10" cy="10" r="3"/>
+                            <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1"/>
+                        </svg>
+                        <span class="radius-text">Search Radius: <span id="radiusValue">5</span> mi</span>
+                        <span id="chevron">▼</span>
+                    </div>
+                    <div class="radius-controls" id="radiusControls" style="display: none;">
+                        <input type="range" min="1" max="25" value="5" class="radius-slider" id="radiusSlider">
+                        <div class="radius-buttons">
+                            <button class="radius-btn" onclick="setRadius(1)">1 mi</button>
+                            <button class="radius-btn" onclick="setRadius(3)">3 mi</button>
+                            <button class="radius-btn active" onclick="setRadius(5)">5 mi</button>
+                            <button class="radius-btn" onclick="setRadius(10)">10 mi</button>
+                            <button class="radius-btn" onclick="setRadius(15)">15 mi</button>
+                            <button class="radius-btn" onclick="setRadius(25)">25 mi</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-stack" id="cardStack">
+                    <div class="swipe-indicator like" id="likeIndicator">💚</div>
+                    <div class="swipe-indicator pass" id="passIndicator">❌</div>
+                    <!-- Cards will be generated by JavaScript -->
+                </div>
+
+                <div class="action-buttons">
+                    <button class="action-btn pass-btn" onclick="passRestaurant()">✕</button>
+                    <button class="action-btn like-btn" onclick="likeRestaurant()">♥</button>
+                </div>
+            </div>
+
+            <div class="tab-bar">
+                <div class="tab-item active">
+                    <span>💖</span>
+                    <span>Discover</span>
+                </div>
+                <div class="tab-item">
+                    <span>❤️</span>
+                    <span>Favorites</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock restaurant data (same as your iOS app)
+        const restaurants = [
+            {
+                name: "Tony's Little Star Pizza",
+                category: "Pizza, Italian",
+                rating: 4.3,
+                distance: "0.5 mi",
+                image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300&h=200&fit=crop"
+            },
+            {
+                name: "Sushi Zen",
+                category: "Japanese, Sushi",
+                rating: 4.7,
+                distance: "0.8 mi",
+                image: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=300&h=200&fit=crop"
+            },
+            {
+                name: "La Taqueria",
+                category: "Mexican, Tacos",
+                rating: 4.5,
+                distance: "1.2 mi",
+                image: "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=300&h=200&fit=crop"
+            },
+            {
+                name: "Blue Bottle Coffee",
+                category: "Coffee, Cafe",
+                rating: 4.2,
+                distance: "0.3 mi",
+                image: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=300&h=200&fit=crop"
+            },
+            {
+                name: "Shake Shack",
+                category: "Burgers, American",
+                rating: 4.0,
+                distance: "1.5 mi",
+                image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300&h=200&fit=crop"
+            }
+        ];
+
+        let currentCardIndex = 0;
+        let isDragging = false;
+        let startX = 0;
+        let currentX = 0;
+
+        function createCard(restaurant, index) {
+            const card = document.createElement('div');
+            card.className = 'restaurant-card';
+            card.style.zIndex = 10 - index;
+            
+            if (index === 1) {
+                card.style.transform = 'scale(0.95) translateY(10px)';
+                card.style.zIndex = 9;
+            } else if (index === 2) {
+                card.style.transform = 'scale(0.9) translateY(20px)';
+                card.style.zIndex = 8;
+            }
+            
+            card.innerHTML = `
+                <img src="${restaurant.image}" alt="${restaurant.name}" class="card-image" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDMwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjJGMkY3Ii8+Cjx0ZXh0IHg9IjE1MCIgeT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOEU4RTkzIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiPkltYWdlPC90ZXh0Pgo8L3N2Zz4K'">
+                <div class="card-content">
+                    <div class="restaurant-name">${restaurant.name}</div>
+                    <div class="restaurant-category">${restaurant.category}</div>
+                    <div class="restaurant-details">
+                        <div class="rating">
+                            <span class="star">⭐</span>
+                            <span>${restaurant.rating}</span>
+                        </div>
+                        <div class="distance">${restaurant.distance}</div>
+                    </div>
+                </div>
+            `;
+
+            // Add touch/mouse events only to the top card
+            if (index === 0) {
+                card.addEventListener('mousedown', startDrag);
+                card.addEventListener('touchstart', startDrag, { passive: false });
+            }
+            
+            return card;
+        }
+
+        function initializeCards() {
+            const cardStack = document.getElementById('cardStack');
+            
+            // Clear existing cards but keep indicators
+            const indicators = cardStack.querySelectorAll('.swipe-indicator');
+            cardStack.innerHTML = '';
+            indicators.forEach(indicator => cardStack.appendChild(indicator));
+            
+            // Add up to 3 cards
+            for (let i = 0; i < Math.min(3, restaurants.length - currentCardIndex); i++) {
+                const restaurantIndex = currentCardIndex + i;
+                if (restaurantIndex < restaurants.length) {
+                    const card = createCard(restaurants[restaurantIndex], i);
+                    cardStack.appendChild(card);
+                }
+            }
+            
+            console.log(`Initialized ${Math.min(3, restaurants.length - currentCardIndex)} cards`);
+        }
+
+        function startDrag(e) {
+            if (e.target.closest('.restaurant-card') !== document.querySelector('.restaurant-card:last-child')) return;
+            
+            isDragging = true;
+            startX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
+            
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchmove', drag);
+            document.addEventListener('touchend', endDrag);
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+            
+            currentX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+            const deltaX = currentX - startX;
+            const rotation = deltaX * 0.1;
+            
+            const topCard = document.querySelector('.restaurant-card:last-child');
+            if (topCard) {
+                topCard.style.transform = `translateX(${deltaX}px) rotate(${rotation}deg)`;
+                
+                // Show indicators
+                const likeIndicator = document.getElementById('likeIndicator');
+                const passIndicator = document.getElementById('passIndicator');
+                
+                if (Math.abs(deltaX) > 50) {
+                    if (deltaX > 0) {
+                        likeIndicator.style.opacity = Math.min(Math.abs(deltaX) / 150, 1);
+                        passIndicator.style.opacity = 0;
+                    } else {
+                        passIndicator.style.opacity = Math.min(Math.abs(deltaX) / 150, 1);
+                        likeIndicator.style.opacity = 0;
+                    }
+                } else {
+                    likeIndicator.style.opacity = 0;
+                    passIndicator.style.opacity = 0;
+                }
+            }
+        }
+
+        function endDrag() {
+            if (!isDragging) return;
+            
+            isDragging = false;
+            const deltaX = currentX - startX;
+            
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', endDrag);
+            document.removeEventListener('touchmove', drag);
+            document.removeEventListener('touchend', endDrag);
+            
+            const topCard = document.querySelector('.restaurant-card:last-child');
+            if (topCard) {
+                if (Math.abs(deltaX) > 150) {
+                    // Complete the swipe
+                    const direction = deltaX > 0 ? 1 : -1;
+                    topCard.style.transform = `translateX(${direction * 1000}px) rotate(${direction * 30}deg)`;
+                    topCard.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        nextCard();
+                    }, 300);
+                } else {
+                    // Snap back
+                    topCard.style.transform = 'translateX(0) rotate(0deg)';
+                }
+            }
+            
+            // Hide indicators
+            document.getElementById('likeIndicator').style.opacity = 0;
+            document.getElementById('passIndicator').style.opacity = 0;
+        }
+
+        function nextCard() {
+            currentCardIndex++;
+            if (currentCardIndex >= restaurants.length) {
+                document.getElementById('cardStack').innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 40px;">
+                        <div style="font-size: 60px; margin-bottom: 20px;">🎉</div>
+                        <h2>You've seen all restaurants!</h2>
+                        <p style="color: #8e8e93; margin: 10px 0;">Check your favorites or adjust search radius</p>
+                        <button onclick="resetCards()" style="background: #007AFF; color: white; border: none; padding: 12px 24px; border-radius: 20px; margin-top: 20px; cursor: pointer;">Search Again</button>
+                    </div>
+                `;
+                return;
+            }
+            initializeCards();
+        }
+
+        function resetCards() {
+            currentCardIndex = 0;
+            initializeCards();
+        }
+
+        function likeRestaurant() {
+            const topCard = document.querySelector('.restaurant-card:last-child');
+            if (topCard) {
+                topCard.style.transform = 'translateX(1000px) rotate(30deg)';
+                topCard.style.opacity = '0';
+                document.getElementById('likeIndicator').style.opacity = 1;
+                setTimeout(() => {
+                    document.getElementById('likeIndicator').style.opacity = 0;
+                    nextCard();
+                }, 300);
+            }
+        }
+
+        function passRestaurant() {
+            const topCard = document.querySelector('.restaurant-card:last-child');
+            if (topCard) {
+                topCard.style.transform = 'translateX(-1000px) rotate(-30deg)';
+                topCard.style.opacity = '0';
+                document.getElementById('passIndicator').style.opacity = 1;
+                setTimeout(() => {
+                    document.getElementById('passIndicator').style.opacity = 0;
+                    nextCard();
+                }, 300);
+            }
+        }
+
+        function toggleRadius() {
+            const controls = document.getElementById('radiusControls');
+            const chevron = document.getElementById('chevron');
+            const isVisible = controls.style.display !== 'none';
+            
+            controls.style.display = isVisible ? 'none' : 'block';
+            chevron.textContent = isVisible ? '▼' : '▲';
+        }
+
+        function setRadius(value) {
+            document.getElementById('radiusSlider').value = value;
+            document.getElementById('radiusValue').textContent = value;
+            
+            // Update button states
+            document.querySelectorAll('.radius-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent === `${value} mi`) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function closeInstructions() {
+            document.getElementById('instructions').style.display = 'none';
+        }
+
+        // Initialize slider
+        document.getElementById('radiusSlider').addEventListener('input', function() {
+            setRadius(parseInt(this.value));
+        });
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing cards...');
+            initializeCards();
+            
+            // Debug: Check if cards were created
+            setTimeout(() => {
+                const cards = document.querySelectorAll('.restaurant-card');
+                console.log(`Found ${cards.length} cards in DOM`);
+                if (cards.length === 0) {
+                    console.error('No cards found! Creating fallback...');
+                    createFallbackCards();
+                }
+            }, 100);
+        });
+
+        function createFallbackCards() {
+            const cardStack = document.getElementById('cardStack');
+            const fallbackCard = document.createElement('div');
+            fallbackCard.className = 'restaurant-card';
+            fallbackCard.style.zIndex = 10;
+            fallbackCard.innerHTML = `
+                <div style="background: linear-gradient(45deg, #ff6b6b, #4ecdc4); height: 200px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">🍕</div>
+                <div class="card-content">
+                    <div class="restaurant-name">Tony's Little Star Pizza</div>
+                    <div class="restaurant-category">Pizza, Italian</div>
+                    <div class="restaurant-details">
+                        <div class="rating">
+                            <span class="star">⭐</span>
+                            <span>4.3</span>
+                        </div>
+                        <div class="distance">0.5 mi</div>
+                    </div>
+                </div>
+            `;
+            cardStack.appendChild(fallbackCard);
+        }
+
+        initializeCards();
+    </script>
+</body>
+</html>

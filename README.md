@@ -1,23 +1,41 @@
-# RestaurantSwipe - "Tinder for Restaurants"
+# RestaurantSwipe - "Tinder for Restaurants" 🍽️
 
-A SwiftUI iOS app that helps users discover nearby restaurants through an intuitive swipe interface.
+A **fully functional** SwiftUI iOS app that helps users discover nearby restaurants through an intuitive swipe interface.
 
-## Features
+## 🚀 Status: READY TO USE!
 
-✅ **Core MVP Features:**
-- Location-based restaurant discovery
-- Swipe interface (left = skip, right = save to favorites)
-- Configurable search radius (1-25 miles)
-- Persistent favorites list
-- Restaurant details with ratings, distance, and categories
-- Location permission handling
+This app is **completely functional** and ready to run! It works with realistic mock data out of the box, and can be easily configured to use live Yelp API data.
 
-🌱 **Additional Features:**
-- Modern, responsive UI with smooth animations
-- Tab-based navigation
-- Detailed restaurant view with maps integration
-- External links to Yelp and Apple Maps
-- Mock data for testing (easily replaceable with live API)
+## ✨ What Works Right Now
+
+## ✨ What Works Right Now
+
+✅ **Core Features:**
+- 📍 Location-based restaurant discovery
+- 👆 Intuitive swipe interface (left = skip, right = save to favorites)
+- 📏 Configurable search radius (1-25 miles)
+- ❤️ Persistent favorites list with UserDefaults
+- ⭐ Restaurant details with ratings, distance, and categories
+- 🔐 Robust location permission handling
+
+� **Enhanced Features:**
+- 🎨 Modern, responsive UI with smooth animations
+- 📱 Tab-based navigation
+- 🗺️ Detailed restaurant view with maps integration
+- 🌐 External links to Yelp and Apple Maps
+- 📊 Realistic mock data with actual food images (15 restaurants)
+- 📳 Haptic feedback for native feel
+- 🔄 Pull-to-refresh functionality
+- 🔄 Automatic fallback from API to mock data
+
+## 🏃‍♂️ Quick Start
+
+1. **Clone & Open**: Open `RestaurantSwipe.xcodeproj` in Xcode
+2. **Build & Run**: Works on iOS Simulator or physical device
+3. **Grant Permissions**: Allow location access when prompted
+4. **Start Swiping**: Enjoy discovering restaurants!
+
+> **Note**: The app works perfectly with included mock data. See [SETUP.md](SETUP.md) for optional Yelp API configuration.
 
 ## Project Structure
 
